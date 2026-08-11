@@ -1,0 +1,20 @@
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: pylon-db
+    environment:
+      POSTGRES_USER: pylon
+      POSTGRES_PASSWORD: pylon
+      POSTGRES_DB: pylon
+    ports:
+      - "5433:5432"
+    volumes:
+      - pylon-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pylon -d pylon"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  pylon-pgdata:
