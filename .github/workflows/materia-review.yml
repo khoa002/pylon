@@ -1,17 +1,22 @@
-# Materia: zero-config caller workflow.
+# Materia caller workflow.
 #
-# Copy this to .github/workflows/materia-review.yml in your repo. This is the
-# whole adoption surface. See docs/adoption.md for setup (the token secret, and
-# the one-time Access setting on the Materia repo).
+# Adapted from khoa002/materia examples/caller-workflow.yml. The upstream example
+# uses `khoa002/materia@v1` directly; that cannot work here. Pylon is public and
+# Materia is private, and GitHub will not resolve a private action from a public
+# repo even with the Access setting enabled:
+#
+#   ##[error]Unable to resolve action `khoa002/materia`, not found
+#
+# So Materia is checked out with a read token and invoked from a local path.
 #
 # Note: the FIRST pull request that adds this file is not reviewed. The action
-# validates that this workflow matches the copy on your default branch, so review
-# begins once this file is merged to the default branch. See docs/adoption.md.
+# validates that this workflow matches the copy on the default branch, so review
+# begins once this file is merged to main. See materia docs/adoption.md.
 
 name: Materia Review
 
 # pull_request, never pull_request_target. Fork PRs get no secrets, which is
-# intentional. See docs/security.md.
+# intentional. See materia docs/security.md.
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
@@ -31,11 +36,27 @@ concurrency:
 jobs:
   review:
     runs-on: ubuntu-latest
+    # Fork PRs receive no secrets, so the Materia checkout below cannot authenticate
+    # and the job would fail red on every outside contribution. Skipping is the
+    # honest outcome: no review, no false alarm.
+    if: github.event.pull_request.head.repo.full_name == github.repository
     steps:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0 # required: Materia needs history to diff against the base
 
-      - uses: khoa002/materia@v1
+      # Materia is private, so it is cloned rather than resolved as an action.
+      # persist-credentials: false keeps the read token out of the checked-out
+      # .git/config once the clone finishes.
+      - name: Check out Materia
+        uses: actions/checkout@v7
+        with:
+          repository: khoa002/materia
+          ref: v1
+          token: ${{ secrets.MATERIA_READ_TOKEN }}
+          path: .materia-action
+          persist-credentials: false
+
+      - uses: ./.materia-action
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
