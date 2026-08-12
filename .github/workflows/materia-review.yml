@@ -1,0 +1,41 @@
+# Materia: zero-config caller workflow.
+#
+# Copy this to .github/workflows/materia-review.yml in your repo. This is the
+# whole adoption surface. See docs/adoption.md for setup (the token secret, and
+# the one-time Access setting on the Materia repo).
+#
+# Note: the FIRST pull request that adds this file is not reviewed. The action
+# validates that this workflow matches the copy on your default branch, so review
+# begins once this file is merged to the default branch. See docs/adoption.md.
+
+name: Materia Review
+
+# pull_request, never pull_request_target. Fork PRs get no secrets, which is
+# intentional. See docs/security.md.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+# Least privilege. Three lines, each explained. Do not use write-all.
+permissions:
+  contents: read # read the code under review
+  pull-requests: write # post review comments
+  id-token: write # exchange the OIDC token for a GitHub App token
+
+# One review per PR at a time. A new push cancels an in-flight run, which cuts
+# duplicate reviews and comment noise. It does not refund a run already started.
+concurrency:
+  group: materia-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # required: Materia needs history to diff against the base
+
+      - uses: khoa002/materia@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
