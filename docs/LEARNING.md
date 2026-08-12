@@ -110,3 +110,62 @@ Fix schema mistakes while the migration is uncommitted and the tables are empty.
 - CI has no Postgres service, so nothing in CI exercises the migration. The round-trip above is local only, and M1's definition of done will be judged on it.
 - `uv run mypy src` does not cover `migrations/env.py`, which is hand-written project code sitting outside the type gate.
 - Carried over: does OoT age-state (child/adult `Time_Travel`) belong in the core model or in the OoT adapter? Needs an ADR before week 3.
+
+## 2026-08-11 — a public repo cannot consume a private GitHub Action
+
+Milestone: M1 week 1 (side quest, abandoned)
+Touched: nothing that survived. PR #2 closed.
+
+### What changed
+
+Nothing. Tried to adopt a private PR-review action into this repo's CI, hit a platform
+constraint, and backed the whole thing out.
+
+### Concepts
+
+**Action resolution respects repository visibility, and the direction matters.** A private
+repo can share an action with other repos owned by the same account via *Settings → Actions
+→ General → Access*, which sets `access_level: "user"`. That policy does **not** extend to a
+*public* consumer. The failure is at job setup, before any step runs:
+
+```
+##[error]Unable to resolve action `khoa002/materia`, not found
+```
+
+The access policy was already `user` when this failed, so the setting is not the missing
+piece — the consumer being public is.
+
+**The workaround, and its real price.** A private action can be cloned rather than resolved:
+check it out with a read token into a path, then `uses: ./that-path`. Composite actions work
+fine from a local path, including ones that nest other actions. It works, but it costs a
+second long-lived credential in a public repo's secrets, on a separate expiry clock, and fork
+PRs get no secrets so the job has to be skipped for them or it fails red on every outside
+contribution.
+
+### Gotchas
+
+**Deleting a GitHub secret does not revoke the credential it held.** From the Claude Code
+GitHub Actions docs: *"If you delete a secret, the credential it held stays valid."* Removing
+the secret only removes the workflow's access. The token itself has to be revoked at its
+source — for a GitHub PAT, in account settings. Two orphaned credentials came out of this
+detour, which is the actual lesson: **each credential a CI experiment mints is a rotation
+obligation, whether or not the experiment ships.**
+
+**A `403` on a git clone is authorization, not authentication.** A token that cannot see a
+repo at all generally gives `404`. `403` means the credential was accepted and its
+permissions were refused — for a fine-grained PAT, usually repository scope left at "Public
+repositories" or `Contents` not set to Read.
+
+### Techniques worth reusing
+
+Push the cheap experiment before designing around a constraint. The whole visibility question
+was settled by one commit and a 4-second job. Reading docs would have suggested the answer;
+the failed run proved it, and proved the access policy was not the missing piece.
+
+Read the vendor's own prerequisites first. This constraint was documented in the action's own
+adoption guide before any of this started.
+
+### Open questions
+
+- Revisit only if the action's repo is ever made public, which collapses adoption back to a
+  single `uses:` line and no extra credential.

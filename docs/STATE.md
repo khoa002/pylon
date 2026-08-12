@@ -32,10 +32,13 @@ Week 1 is complete. Week 2 is the rule expression language.
     (`progression`) documented in `PROJECT.md`. Raw and bulk inserts were rejected,
     which is exactly how week 3 ingest will write. Fixed with `values_callable`.
 - `docs/LEARNING.md` started: append-only log, one entry per session.
+- Materia (a private PR-review GitHub Action) was evaluated and rejected. Pylon is
+  public and the action is private, which GitHub does not allow even with the
+  action repo's access policy set to `user`. See `docs/LEARNING.md`.
 
 ## In progress
 
-Nothing. Week 1 work is committed on `m1/alembic-initial-migration`.
+Nothing. Week 1 work is merged to `main` (PR #1), CI green.
 
 ## Blocked / needs a decision
 
