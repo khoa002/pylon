@@ -10,7 +10,7 @@ stored as raw strings to be eval'd, and never as pickled callables.
 import enum
 from typing import Any
 
-from sqlalchemy import ForeignKey, Index, String, UniqueConstraint
+from sqlalchemy import Enum, ForeignKey, Index, String, UniqueConstraint
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -112,6 +112,18 @@ class Item(Base, ProvenanceMixin):
     id: Mapped[int] = mapped_column(primary_key=True)
     game_id: Mapped[int] = mapped_column(ForeignKey("games.id"), index=True)
     name: Mapped[str] = mapped_column(String(255))
-    classification: Mapped[ItemClassification] = mapped_column(default=ItemClassification.FILLER)
+    classification: Mapped[ItemClassification] = mapped_column(
+        Enum(
+            ItemClassification,
+            name="itemclassification",
+            # Without values_callable the native enum stores member *names*
+            # ("PROGRESSION"), not the StrEnum values ("progression"). The lowercase
+            # value is the documented vocabulary and what adapters and API payloads
+            # carry, so a bulk insert of "progression" would otherwise be rejected
+            # by the database.
+            values_callable=lambda enum: [member.value for member in enum],
+        ),
+        default=ItemClassification.FILLER,
+    )
 
     game: Mapped[Game] = relationship(back_populates="items")
