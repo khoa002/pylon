@@ -24,6 +24,16 @@ uv run pylon --help                            # CLI
 docker compose -f infra/docker-compose.yml up -d
 ```
 
+## 🛑 Release discipline
+
+This project ships in small tagged releases because the failure mode here is drift, not difficulty. See `docs/ROADMAP.md`.
+
+- **Work on the current release only.** It is named at the top of `docs/STATE.md`. Do not build ahead of it, even when the next piece is obvious.
+- **Every release ships a demo command**, not just passing tests. If it cannot be demoed in one terminal command, it is not done.
+- ⚠️ **If a release is running long, cut scope. Never extend.** Each release in the roadmap names its own scope cut. Take it.
+- **New ideas go to `docs/ICEBOX.md`, unopened.** If the user proposes scope mid-release, add it to the icebox and say so rather than building it.
+- **Nothing is done until it is tagged and published.** Definition of done for every release includes `git tag`, `git push --tags`, and `gh release create`.
+
 ## Rules
 
 - **Write the failing test first.** Tests marked `xfail` encode specs that are not built yet. When you implement one, remove the marker in the same commit.
@@ -69,6 +79,6 @@ src/pylon/
   cli.py      Typer entrypoint
 ```
 
-## Current milestone
+## Current release
 
-See `docs/STATE.md`. Do not work ahead of the current milestone without saying so explicitly.
+See the top of `docs/STATE.md`. Do not work ahead of it. If something seems worth doing that is not in the current release, put it in `docs/ICEBOX.md` and mention it, rather than building it.

@@ -38,6 +38,24 @@ Pylon authors no game content. Randomizer projects must answer "is this seed bea
 
 See [`docs/LICENSES.md`](docs/LICENSES.md) for obligations and for sources that are explicitly off limits.
 
+## Progress
+
+Eleven releases, roughly one a week. Each is demoable in one command. ⭐ `v0.5.0` is the point where Pylon does the thing it exists to do.
+
+- [x] **v0.1.0** Scaffold — `uv run pytest && pylon --help`
+- [ ] **v0.2.0** Rules parse — `pylon parse "A and (B or C)"`
+- [ ] **v0.3.0** Rules evaluate — `pylon check "Bow and Bomb_Bag" --have Bow`
+- [ ] **v0.4.0** OoT loads — `pylon graph-stats --game oot`
+- [ ] ⭐ **v0.5.0** It answers — `pylon can-reach "Fire Temple Boss" --have ...`
+- [ ] **v0.6.0** API — `curl localhost:8000/reachability`
+- [ ] **v0.7.0** Live — the same curl, public URL
+- [ ] **v0.8.0** Second game — an Archipelago title loads, engine untouched
+- [ ] **v0.9.0** It talks — `pylon ask "can I get into the Fire Temple?"`
+- [ ] **v0.10.0** It is measured — `pylon evals run`
+- [ ] 🏁 **v1.0.0** Shipped — four dated eval runs showing improvement
+
+Full detail in [`docs/ROADMAP.md`](docs/ROADMAP.md).
+
 ## Quickstart
 
 Requires [uv](https://docs.astral.sh/uv/) and Docker.
@@ -58,7 +76,8 @@ uv run pylon --help
 |---|---|
 | [`CLAUDE.md`](CLAUDE.md) | Conventions and guardrails. Read before writing code |
 | [`docs/PROJECT.md`](docs/PROJECT.md) | What this is and is not |
-| [`docs/ROADMAP.md`](docs/ROADMAP.md) | 12 weeks, 3 milestones |
+| [`docs/ROADMAP.md`](docs/ROADMAP.md) | Eleven releases, one demo command each |
+| [`docs/ICEBOX.md`](docs/ICEBOX.md) | Parked ideas. Where mid-release scope goes to wait |
 | [`docs/STATE.md`](docs/STATE.md) | Current session state. Rewritten every session |
 | [`docs/DECISIONS/`](docs/DECISIONS/) | ADRs |
 | [`docs/EVALS.md`](docs/EVALS.md) | Every eval run, dated, with numbers |
