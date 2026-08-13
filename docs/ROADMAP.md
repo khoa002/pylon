@@ -41,12 +41,15 @@ These exist because the failure mode for this project is not difficulty. It is d
 
 **Demo:** `uv run pytest && uv run pylon --help`
 
-Repo, uv, ruff, mypy strict, pytest, GitHub Actions. Postgres via Docker Compose. Canonical SQLAlchemy models with `ProvenanceMixin`. Rule AST node types. Adapter protocol. Typer CLI. Docs and ADR-001 to ADR-003. 15 passing tests, 35 `xfail(strict)` specs.
+Repo, uv, ruff, mypy strict, pytest, GitHub Actions. Postgres via Docker Compose. Canonical SQLAlchemy models with `ProvenanceMixin`. Rule AST node types. Adapter protocol. Typer CLI. Docs and ADR-001 to ADR-003. 15 passing tests, 35 `xfail(strict)` specs. Alembic plus the initial migration for all five tables, round-trip verified.
 
 - [x] CI green
 - [x] `mypy --strict` clean
+- [x] `uv.lock` committed so CI and local resolve identically
+- [x] Alembic wired to `pylon.config.Settings`, no credentials in `alembic.ini`
+- [x] Initial migration verified by `upgrade` → `downgrade base` → `upgrade`
 - [x] Pushed to GitHub
-- [ ] Tagged and published
+- [ ] **Tagged and published**
 
 ---
 
@@ -83,12 +86,13 @@ Pure evaluator plus `explain`, which returns the failing leaf terms. This is the
 
 **Demo:** `pylon ingest oot && pylon graph-stats --game oot`
 
-The OoT Randomizer adapter. Alembic migrations. Macro resolution from `LogicHelpers.json`.
+The OoT Randomizer adapter. Macro resolution from `LogicHelpers.json`. (Alembic and the initial migration already shipped in v0.1.0.)
 
 - [ ] `pylon ingest oot` is idempotent: running twice changes no rows
 - [ ] Every row has provenance populated
 - [ ] `graph-stats` prints region, entrance, location, and item counts
 - [ ] Unresolved macros are reported as warnings, never silently dropped
+- [ ] ⚠️ CI gains a Postgres service and a test that runs `alembic upgrade head`. Migrations are currently verified locally only
 
 This is the first release with a satisfying number attached to it. Put the counts in the release notes.
 

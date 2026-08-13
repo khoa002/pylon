@@ -28,6 +28,7 @@ This file exists because the failure mode for this project is scope drift, not d
 
 <!-- Add one line, with the date. Do not act on these during a release. -->
 
+- 2026-08-11: widen the type gate to cover `migrations/env.py`, or accept it as deliberately excluded
 - 2026-08-11: pairwise rule probing for and/or discrimination, if v0.8.0 has to be cut back to one-at-a-time
 - 2026-08-11: `pylon why "<step>"` to explain a single step in isolation
 - 2026-08-11: graph visualisation, probably graphviz DOT export
